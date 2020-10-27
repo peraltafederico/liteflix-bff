@@ -1,15 +1,19 @@
-import { Injectable } from '@nestjs/common'
-import { forkJoin, Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { Injectable, Logger } from '@nestjs/common'
+import { forkJoin, Observable, throwError } from 'rxjs'
+import { map, tap, catchError } from 'rxjs/operators'
+import { ConfigService } from '@nestjs/config'
 import { LiteflixMovie, TmdbMovies } from '../../commons/interfaces'
 import { TmbdService } from '../../services/tmdb/tmdb.service'
 import { LiteflixService } from '../../services/liteflix/liteflix.service'
+import { MovieHelper } from './helpers/movie.helper'
 
 @Injectable()
 export class MovieService {
   constructor(
     private readonly liteflixService: LiteflixService,
-    private readonly tmdbService: TmbdService
+    private readonly tmdbService: TmbdService,
+    private logger: Logger,
+    private configService: ConfigService
   ) {}
 
   createLiteflixMovie(body: {
@@ -21,7 +25,13 @@ export class MovieService {
   }
 
   getLiteflixMovies(): Observable<LiteflixMovie[]> {
-    return this.liteflixService.getLiteflixMovies()
+    return this.liteflixService
+      .getLiteflixMovies()
+      .pipe(
+        map((response) =>
+          response.map((movie) => MovieHelper.parseLiteflixMovie(movie))
+        )
+      )
   }
 
   getTmdbMovies(): Observable<TmdbMovies> {
@@ -37,11 +47,27 @@ export class MovieService {
             new Date(a.releaseDate).getTime()
         )
 
+        const upcoming = upcomingResponse.results.slice(
+          0,
+          this.configService.get('upcomingMoviesAmount')
+        )
+
+        const popular = popularResponse.results.slice(
+          0,
+          this.configService.get('popularMoviesAmount')
+        )
+
         return {
-          featured,
-          upcoming: upcomingResponse.results.slice(0, 4),
-          popular: popularResponse.results.slice(0, 4),
+          featured: MovieHelper.parseFeaturedMovie(featured),
+          upcoming: upcoming.map((movie) => MovieHelper.parseTmdbMovie(movie)),
+          popular: popular.map((movie) => MovieHelper.parseTmdbMovie(movie)),
         }
+      }),
+      tap(() => this.logger.log('Tmdb movies parsed successfully')),
+      catchError((err) => {
+        this.logger.error('There was an error parsing tmdb movies')
+
+        return throwError(err)
       })
     )
   }

@@ -12,5 +12,6 @@ import { LiteflixService } from './liteflix.service'
     }),
   ],
   providers: [LiteflixService, Logger],
+  exports: [LiteflixService],
 })
 export class LiteflixModule {}
