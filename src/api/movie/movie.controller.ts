@@ -20,7 +20,7 @@ export class MovieController {
   }
 
   @Get('/tmdb')
-  getTmdbMovies(): Observable<TmdbMovies> {
+  getTmdbMovies(): Observable<Promise<TmdbMovies>> {
     return this.movieService.getTmdbMovies()
   }
 }

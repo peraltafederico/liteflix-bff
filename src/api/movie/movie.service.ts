@@ -12,6 +12,7 @@ export class MovieService {
   constructor(
     private readonly liteflixService: LiteflixService,
     private readonly tmdbService: TmbdService,
+    private readonly movieHelper: MovieHelper,
     private logger: Logger,
     private configService: ConfigService
   ) {}
@@ -29,18 +30,18 @@ export class MovieService {
       .getLiteflixMovies()
       .pipe(
         map((response) =>
-          response.map((movie) => MovieHelper.parseLiteflixMovie(movie))
+          response.map((movie) => this.movieHelper.parseLiteflixMovie(movie))
         )
       )
   }
 
-  getTmdbMovies(): Observable<TmdbMovies> {
+  getTmdbMovies(): Observable<Promise<TmdbMovies>> {
     return forkJoin([
       this.tmdbService.getNowPlayingMovies(),
       this.tmdbService.getUpcomingMovies(),
       this.tmdbService.getPopularMovies(),
     ]).pipe(
-      map(([nowPlayingResponse, upcomingResponse, popularResponse]) => {
+      map(async ([nowPlayingResponse, upcomingResponse, popularResponse]) => {
         const [featured] = nowPlayingResponse.results.sort(
           (a, b) =>
             new Date(b.releaseDate).getTime() -
@@ -57,11 +58,7 @@ export class MovieService {
           this.configService.get('popularMoviesAmount')
         )
 
-        return {
-          featured: MovieHelper.parseFeaturedMovie(featured),
-          upcoming: upcoming.map((movie) => MovieHelper.parseTmdbMovie(movie)),
-          popular: popular.map((movie) => MovieHelper.parseTmdbMovie(movie)),
-        }
+        return this.movieHelper.parseTmdbMovies({ featured, upcoming, popular })
       }),
       tap(() => this.logger.log('Tmdb movies parsed successfully')),
       catchError((err) => {
