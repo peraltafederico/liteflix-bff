@@ -2,10 +2,13 @@ import { Injectable, Logger } from '@nestjs/common'
 import { forkJoin, Observable, throwError } from 'rxjs'
 import { map, tap, catchError } from 'rxjs/operators'
 import { ConfigService } from '@nestjs/config'
-import { LiteflixMovie, TmdbMovies } from '../../commons/interfaces'
 import { TmbdService } from '../../services/tmdb/tmdb.service'
 import { LiteflixService } from '../../services/liteflix/liteflix.service'
 import { MovieHelper } from './helpers/movie.helper'
+import { GetMainMoviesResponse } from './dto/get-main-movies-response.dto'
+import { Movie } from './dto/movie.dto'
+import { ParsedGroupedByGenreMovies } from './dto/parsed-grouped-by-genre-movies'
+
 
 @Injectable()
 export class MovieService {
@@ -15,27 +18,25 @@ export class MovieService {
     private readonly movieHelper: MovieHelper,
     private logger: Logger,
     private configService: ConfigService
-  ) {}
+  ) { }
 
   createLiteflixMovie(body: {
     title: string
     imgUrl: string
     tmdbGenreId: number
-  }): Observable<LiteflixMovie[]> {
+  }): Observable<Movie[]> {
     return this.liteflixService.createMovie(body)
   }
 
-  getLiteflixMovies(): Observable<LiteflixMovie[]> {
+  getLiteflixMovies(): Observable<Promise<ParsedGroupedByGenreMovies[]>> {
     return this.liteflixService
-      .getLiteflixMovies()
+      .getGroupedByGenreLiteflixMovies()
       .pipe(
-        map((response) =>
-          response.map((movie) => this.movieHelper.parseLiteflixMovie(movie))
-        )
+        map(async (response) => this.movieHelper.parseLiteflixMovies(response))
       )
   }
 
-  getTmdbMovies(): Observable<Promise<TmdbMovies>> {
+  getTmdbMovies(): Observable<Promise<GetMainMoviesResponse>> {
     return forkJoin([
       this.tmdbService.getNowPlayingMovies(),
       this.tmdbService.getUpcomingMovies(),

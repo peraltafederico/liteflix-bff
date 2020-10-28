@@ -1,15 +1,12 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable class-methods-use-this */
-import { CACHE_MANAGER, Inject } from '@nestjs/common'
-import { Cache } from 'cache-manager'
-import { TmdbMovie } from 'src/commons/interfaces'
-import { TmbdService } from 'src/services/tmdb/tmdb.service'
+import { Injectable } from '@nestjs/common'
+import { GroupedByGenreMovies, TmdbMovie } from 'src/commons/interfaces'
+import { CacheHelper } from 'src/commons/helpers/cache.helper'
+import { GetMainMoviesResponse } from '../dto/get-main-movies-response.dto'
+import { ParsedGroupedByGenreMovies } from '../dto/parsed-grouped-by-genre-movies'
 
+@Injectable()
 export class MovieHelper {
-  constructor(
-    @Inject(CACHE_MANAGER) private readonly cache: Cache,
-    private readonly tmdbService: TmbdService
-  ) {}
+  constructor(private readonly cacheHelper: CacheHelper) {}
 
   async parseTmdbMovies({
     featured,
@@ -19,18 +16,8 @@ export class MovieHelper {
     featured: TmdbMovie
     upcoming: TmdbMovie[]
     popular: TmdbMovie[]
-  }): Promise<any> {
-    const tmdbConfig = await this.cache.wrap(
-      'tmdbConfig',
-      async (): Promise<string> => {
-        const config = await this.tmdbService.getConfig().toPromise()
-
-        return JSON.stringify(config)
-      },
-      { ttl: 1800 }
-    )
-
-    const { images } = JSON.parse(tmdbConfig)
+  }): Promise<GetMainMoviesResponse> {
+    const { images } = await this.cacheHelper.getTmdbConfig()
 
     const getImgBaseUrl = (size: number): string =>
       `${images.secureBaseUrl}${images.posterSizes[size]}`
@@ -50,9 +37,22 @@ export class MovieHelper {
     }
   }
 
-  parseLiteflixMovie(movie: any): any {
-    return {
-      imgUrl: movie.imgUrl,
-    }
+  async parseLiteflixMovies(
+    groupedByGenreMovies: GroupedByGenreMovies[]
+  ): Promise<ParsedGroupedByGenreMovies[]> {
+    const genres = await this.cacheHelper.getGenres()
+
+    return groupedByGenreMovies
+      .map((group) => {
+        const { name: genre } = genres.find((i) => i.id === group.tmdbGenreId)
+
+        return {
+          genre,
+          movies: group.movies.map((movie) => ({
+            imgUrl: movie.imgUrl,
+          })),
+        }
+      })
+      .sort((a, b) => a.genre.localeCompare(b.genre))
   }
 }

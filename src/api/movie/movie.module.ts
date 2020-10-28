@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { LiteflixModule } from 'src/services/liteflix/liteflix.module'
 import { TmdbModule } from 'src/services/tmdb/tmdb.module'
 import * as redisStore from 'cache-manager-redis-store'
+import { CacheHelper } from 'src/commons/helpers/cache.helper'
 import { MovieHelper } from './helpers/movie.helper'
 import { MovieController } from './movie.controller'
 import { MovieService } from './movie.service'
@@ -22,6 +23,6 @@ import { MovieService } from './movie.service'
     LiteflixModule,
   ],
   controllers: [MovieController],
-  providers: [MovieService, Logger, ConfigService, MovieHelper],
+  providers: [MovieService, Logger, ConfigService, CacheHelper, MovieHelper],
 })
 export class MovieModule {}
