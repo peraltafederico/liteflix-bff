@@ -1,7 +1,8 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common'
 import { Observable, throwError } from 'rxjs'
 import { catchError, map, tap } from 'rxjs/operators'
-import { TmdbResponse } from '../../commons/interfaces'
+import { Genre } from 'src/api/movie/dto/genre.dto'
+import { TmdbConfig, TmdbResponse } from '../../commons/interfaces'
 
 @Injectable()
 export class TmbdService {
@@ -9,7 +10,7 @@ export class TmbdService {
 
   getNowPlayingMovies(params?: { page: string }): Observable<TmdbResponse> {
     return this.httpService
-      .get<TmdbResponse>('/now-playing', { params })
+      .get<TmdbResponse>('/movie/now-playing', { params })
       .pipe(
         map((response) => response.data),
         tap(() => this.logger.log('Now playing movies returned successfully')),
@@ -26,6 +27,7 @@ export class TmbdService {
       .get<TmdbResponse>('/movie/upcoming', { params })
       .pipe(
         map((response) => response.data),
+        tap(() => this.logger.log('Upcoming movies returned successfully')),
         catchError((err) => {
           this.logger.error('There was an error getting upcoming movies')
 
@@ -39,11 +41,36 @@ export class TmbdService {
       .get<TmdbResponse>('/movie/popular', { params })
       .pipe(
         map((response) => response.data),
+        tap(() => this.logger.log('Popular movies returned successfully')),
         catchError((err) => {
           this.logger.error('There was an error getting popular movies')
 
           return throwError(err)
         })
       )
+  }
+
+  getConfig(): Observable<TmdbConfig> {
+    return this.httpService.get<TmdbConfig>('/config').pipe(
+      map((response) => response.data),
+      tap(() => this.logger.log('Configuration returned successfully')),
+      catchError((err) => {
+        this.logger.error(`There was an error getting configuration`)
+
+        return throwError(err)
+      })
+    )
+  }
+
+  getGenres(): Observable<Genre[]> {
+    return this.httpService.get<Genre[]>('/genre').pipe(
+      map((response) => response.data),
+      tap(() => this.logger.log('Genres returned successfully')),
+      catchError((err) => {
+        this.logger.error('There was an error getting genres')
+
+        return throwError(err)
+      })
+    )
   }
 }

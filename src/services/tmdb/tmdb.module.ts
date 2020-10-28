@@ -1,5 +1,6 @@
 import { HttpModule, Logger, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { TmbdService } from './tmdb.service'
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { ConfigService } from '@nestjs/config'
       inject: [ConfigService],
     }),
   ],
-  providers: [Logger],
+  providers: [TmbdService, Logger],
+  exports: [TmbdService],
 })
-export class LiteflixModule {}
+export class TmdbModule {}
