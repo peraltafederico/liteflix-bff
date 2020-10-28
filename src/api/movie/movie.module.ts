@@ -16,6 +16,7 @@ import { MovieService } from './movie.service'
         host: configService.get('redisHost'),
         port: configService.get('redisPort'),
         auth_pass: configService.get('redisPass'),
+        ttl: 1800,
       }),
       inject: [ConfigService],
     }),

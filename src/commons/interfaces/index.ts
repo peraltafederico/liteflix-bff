@@ -24,7 +24,7 @@ export interface TmdbResponse {
     minimum: string
   }
   totalPages: number
-} 
+}
 export interface TmdbConfig {
   images: {
     baseUrl: string
@@ -36,11 +36,6 @@ export interface TmdbConfig {
     stillSizes: string[]
   }
   changeKeys: string[]
-}
-
-export interface TmdbGenre {
-  id: number
-  name: string
 }
 
 export interface GroupedByGenreMovies {

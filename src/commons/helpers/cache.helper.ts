@@ -1,7 +1,8 @@
 import { CACHE_MANAGER, Inject } from '@nestjs/common'
 import { Cache } from 'cache-manager'
+import { Genre } from 'src/api/movie/dto/genre.dto'
 import { TmbdService } from 'src/services/tmdb/tmdb.service'
-import { TmdbConfig, TmdbGenre } from '../interfaces'
+import { TmdbConfig } from '../interfaces'
 
 export class CacheHelper {
   constructor(
@@ -23,7 +24,7 @@ export class CacheHelper {
     return JSON.parse(tmdbConfig)
   }
 
-  async getGenres(): Promise<TmdbGenre[]> {
+  async getGenres(): Promise<Genre[]> {
     const genres = await this.cache.wrap(
       'genres',
       async (): Promise<string> => {

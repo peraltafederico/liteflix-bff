@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger'
 import { Observable } from 'rxjs'
+import { Genre } from './dto/genre.dto'
 import { GetMainMoviesResponse } from './dto/get-main-movies-response.dto'
 import { Movie } from './dto/movie.dto'
 import { ParsedGroupedByGenreMovies } from './dto/parsed-grouped-by-genre-movies'
@@ -15,10 +16,10 @@ export class MovieController {
     description: 'Movie created successfully',
     type: [Movie],
   })
-  createLiteflixMovie(
+  createMovie(
     @Body() body: { title: string; imgUrl: string; tmdbGenreId: number }
   ): Observable<Movie[]> {
-    return this.movieService.createLiteflixMovie(body)
+    return this.movieService.createMovie(body)
   }
 
   @Get('/main')
@@ -26,16 +27,25 @@ export class MovieController {
     description: 'Main movies returned successfully',
     type: GetMainMoviesResponse,
   })
-  getTmdbMovies(): Observable<Promise<GetMainMoviesResponse>> {
-    return this.movieService.getTmdbMovies()
+  getMainMovies(): Observable<Promise<GetMainMoviesResponse>> {
+    return this.movieService.getMainMovies()
   }
 
-  @Get('/genre')
+  @Get('/grouped-by-genre')
   @ApiOkResponse({
     description: 'Movies grouped by genred returned successfully',
     type: [ParsedGroupedByGenreMovies],
   })
-  getLiteflixMovies(): Observable<Promise<ParsedGroupedByGenreMovies[]>> {
-    return this.movieService.getLiteflixMovies()
+  getGroupedByGenreMovies(): Observable<Promise<ParsedGroupedByGenreMovies[]>> {
+    return this.movieService.getGroupedByGenreMovies()
+  }
+
+  @Get('/genres')
+  @ApiOkResponse({
+    description: 'Genres returned successfully',
+    type: [Genre],
+  })
+  getMovieGenres(): Promise<Genre[]> {
+    return this.movieService.getMovieGenres()
   }
 }
