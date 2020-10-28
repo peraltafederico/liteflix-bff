@@ -8,6 +8,9 @@ interface EnvironmentConfiguration {
   tmdbBaseUrl: string
   upcomingMoviesAmount: number
   popularMoviesAmount: number
+  redisHost: string
+  redisPass: string
+  redisPort: number
 }
 
 const {
@@ -15,6 +18,9 @@ const {
   TMDB_BASE_URL,
   POPULAR_MOVIES_AMOUNT,
   UPCOMING_MOVIES_AMOUNT,
+  REDIS_HOST,
+  REDIS_PORT,
+  REDIS_PASSWORD,
 } = process.env
 
 const envConfig = (): EnvironmentConfiguration => ({
@@ -22,6 +28,9 @@ const envConfig = (): EnvironmentConfiguration => ({
   tmdbBaseUrl: TMDB_BASE_URL,
   upcomingMoviesAmount: toNumber(UPCOMING_MOVIES_AMOUNT),
   popularMoviesAmount: toNumber(POPULAR_MOVIES_AMOUNT),
+  redisHost: REDIS_HOST,
+  redisPass: REDIS_PASSWORD,
+  redisPort: toNumber(REDIS_PORT),
 })
 
 export default envConfig

@@ -1,7 +1,8 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common'
 import { Observable, throwError } from 'rxjs'
 import { catchError, map, tap } from 'rxjs/operators'
-import { LiteflixMovie } from '../../commons/interfaces'
+import { Movie } from 'src/api/movie/dto/movie.dto'
+import { GroupedByGenreMovies } from 'src/commons/interfaces'
 
 @Injectable()
 export class LiteflixService {
@@ -11,9 +12,9 @@ export class LiteflixService {
     title: string
     imgUrl: string
     tmdbGenreId: number
-  }): Observable<LiteflixMovie[]> {
+  }): Observable<Movie[]> {
     return this.httpService
-      .post<LiteflixMovie[]>('/movie', { body })
+      .post<Movie[]>('/movie', { body })
       .pipe(
         map((response) => response.data),
         tap(() =>
@@ -29,15 +30,17 @@ export class LiteflixService {
       )
   }
 
-  getLiteflixMovies(): Observable<LiteflixMovie[]> {
-    return this.httpService.get<LiteflixMovie[]>('/movie').pipe(
-      map((response) => response.data),
-      tap(() => this.logger.log('Movies were returned successfully')),
-      catchError((err) => {
-        this.logger.error(`There was an error getting returning movies`)
+  getGroupedByGenreLiteflixMovies(): Observable<GroupedByGenreMovies[]> {
+    return this.httpService
+      .get<GroupedByGenreMovies[]>('/movie/group-by-genre')
+      .pipe(
+        map((response) => response.data),
+        tap(() => this.logger.log('Movies were returned successfully')),
+        catchError((err) => {
+          this.logger.error(`There was an error getting returning movies`)
 
-        return throwError(err)
-      })
-    )
+          return throwError(err)
+        })
+      )
   }
 }

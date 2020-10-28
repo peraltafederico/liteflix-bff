@@ -1,7 +1,7 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common'
 import { Observable, throwError } from 'rxjs'
 import { catchError, map, tap } from 'rxjs/operators'
-import { TmdbResponse } from '../../commons/interfaces'
+import { TmdbConfig, TmdbGenre, TmdbResponse } from '../../commons/interfaces'
 
 @Injectable()
 export class TmbdService {
@@ -49,8 +49,8 @@ export class TmbdService {
       )
   }
 
-  getConfig(): Observable<any> {
-    return this.httpService.get<any>('/config').pipe(
+  getConfig(): Observable<TmdbConfig> {
+    return this.httpService.get<TmdbConfig>('/config').pipe(
       map((response) => response.data),
       tap(() => this.logger.log('Configuration returned successfully')),
       catchError((err) => {
@@ -61,16 +61,14 @@ export class TmbdService {
     )
   }
 
-  // getGenres(params?: { page: string }): Observable<any> {
-  //   return this.httpService
-  //     .get<any>('/genre/movie/list', { params })
-  //     .pipe(
-  //       map((response) => response.data),
-  //       catchError((err) => {
-  //         this.logger.error('There was an error getting genres')
+  getGenres(): Observable<TmdbGenre[]> {
+    return this.httpService.get<TmdbGenre[]>('/genre').pipe(
+      map((response) => response.data),
+      catchError((err) => {
+        this.logger.error('There was an error getting genres')
 
-  //         return throwError(err)
-  //       })
-  //     )
-  // }
+        return throwError(err)
+      })
+    )
+  }
 }

@@ -2,45 +2,47 @@ import { Injectable, Logger } from '@nestjs/common'
 import { forkJoin, Observable, throwError } from 'rxjs'
 import { map, tap, catchError } from 'rxjs/operators'
 import { ConfigService } from '@nestjs/config'
-import { LiteflixMovie, TmdbMovies } from '../../commons/interfaces'
 import { TmbdService } from '../../services/tmdb/tmdb.service'
 import { LiteflixService } from '../../services/liteflix/liteflix.service'
 import { MovieHelper } from './helpers/movie.helper'
+import { GetMainMoviesResponse } from './dto/get-main-movies-response.dto'
+import { Movie } from './dto/movie.dto'
+import { ParsedGroupedByGenreMovies } from './dto/parsed-grouped-by-genre-movies'
+
 
 @Injectable()
 export class MovieService {
   constructor(
     private readonly liteflixService: LiteflixService,
     private readonly tmdbService: TmbdService,
+    private readonly movieHelper: MovieHelper,
     private logger: Logger,
     private configService: ConfigService
-  ) {}
+  ) { }
 
   createLiteflixMovie(body: {
     title: string
     imgUrl: string
     tmdbGenreId: number
-  }): Observable<LiteflixMovie[]> {
+  }): Observable<Movie[]> {
     return this.liteflixService.createMovie(body)
   }
 
-  getLiteflixMovies(): Observable<LiteflixMovie[]> {
+  getLiteflixMovies(): Observable<Promise<ParsedGroupedByGenreMovies[]>> {
     return this.liteflixService
-      .getLiteflixMovies()
+      .getGroupedByGenreLiteflixMovies()
       .pipe(
-        map((response) =>
-          response.map((movie) => MovieHelper.parseLiteflixMovie(movie))
-        )
+        map(async (response) => this.movieHelper.parseLiteflixMovies(response))
       )
   }
 
-  getTmdbMovies(): Observable<TmdbMovies> {
+  getTmdbMovies(): Observable<Promise<GetMainMoviesResponse>> {
     return forkJoin([
       this.tmdbService.getNowPlayingMovies(),
       this.tmdbService.getUpcomingMovies(),
       this.tmdbService.getPopularMovies(),
     ]).pipe(
-      map(([nowPlayingResponse, upcomingResponse, popularResponse]) => {
+      map(async ([nowPlayingResponse, upcomingResponse, popularResponse]) => {
         const [featured] = nowPlayingResponse.results.sort(
           (a, b) =>
             new Date(b.releaseDate).getTime() -
@@ -57,11 +59,7 @@ export class MovieService {
           this.configService.get('popularMoviesAmount')
         )
 
-        return {
-          featured: MovieHelper.parseFeaturedMovie(featured),
-          upcoming: upcoming.map((movie) => MovieHelper.parseTmdbMovie(movie)),
-          popular: popular.map((movie) => MovieHelper.parseTmdbMovie(movie)),
-        }
+        return this.movieHelper.parseTmdbMovies({ featured, upcoming, popular })
       }),
       tap(() => this.logger.log('Tmdb movies parsed successfully')),
       catchError((err) => {
