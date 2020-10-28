@@ -32,7 +32,7 @@ export class LiteflixService {
 
   getGroupedByGenreLiteflixMovies(): Observable<GroupedByGenreMovies[]> {
     return this.httpService
-      .get<GroupedByGenreMovies[]>('/movie/group-by-genre')
+      .get<GroupedByGenreMovies[]>('/movie/grouped-by-genre')
       .pipe(
         map((response) => response.data),
         tap(() => this.logger.log('Movies were returned successfully')),
