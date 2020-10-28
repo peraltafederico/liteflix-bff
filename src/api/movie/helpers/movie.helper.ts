@@ -8,7 +8,7 @@ import { ParsedGroupedByGenreMovies } from '../dto/parsed-grouped-by-genre-movie
 export class MovieHelper {
   constructor(private readonly cacheHelper: CacheHelper) {}
 
-  async parseTmdbMovies({
+  async parseMainMovies({
     featured,
     upcoming,
     popular,
@@ -37,7 +37,7 @@ export class MovieHelper {
     }
   }
 
-  async parseLiteflixMovies(
+  async parseGroupedByGenreMovies(
     groupedByGenreMovies: GroupedByGenreMovies[]
   ): Promise<ParsedGroupedByGenreMovies[]> {
     const genres = await this.cacheHelper.getGenres()

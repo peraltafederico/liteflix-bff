@@ -1,7 +1,8 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common'
 import { Observable, throwError } from 'rxjs'
 import { catchError, map, tap } from 'rxjs/operators'
-import { TmdbConfig, TmdbGenre, TmdbResponse } from '../../commons/interfaces'
+import { Genre } from 'src/api/movie/dto/genre.dto'
+import { TmdbConfig, TmdbResponse } from '../../commons/interfaces'
 
 @Injectable()
 export class TmbdService {
@@ -61,9 +62,10 @@ export class TmbdService {
     )
   }
 
-  getGenres(): Observable<TmdbGenre[]> {
-    return this.httpService.get<TmdbGenre[]>('/genre').pipe(
+  getGenres(): Observable<Genre[]> {
+    return this.httpService.get<Genre[]>('/genre').pipe(
       map((response) => response.data),
+      tap(() => this.logger.log('Genres returned successfully')),
       catchError((err) => {
         this.logger.error('There was an error getting genres')
 
