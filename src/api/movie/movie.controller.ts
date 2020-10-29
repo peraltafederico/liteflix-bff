@@ -11,7 +11,7 @@ import { MovieService } from './movie.service'
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
-  @Post('/liteflix')
+  @Post('/')
   @ApiCreatedResponse({
     description: 'Movie created successfully',
     type: [Movie],

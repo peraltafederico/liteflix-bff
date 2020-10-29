@@ -29,10 +29,10 @@ export class MovieHelper {
         overview: featured.overview,
       },
       upcoming: upcoming.map((movie) => ({
-        imgUrl: `${getImgBaseUrl(3)}${movie.posterPath}`,
+        imgUrl: `${getImgBaseUrl(5)}${movie.backdropPath}`,
       })),
       popular: popular.map((movie) => ({
-        imgUrl: `${getImgBaseUrl(3)}${movie.backdropPath}`,
+        imgUrl: `${getImgBaseUrl(3)}${movie.posterPath}`,
       })),
     }
   }
@@ -42,9 +42,13 @@ export class MovieHelper {
   ): Promise<ParsedGroupedByGenreMovies[]> {
     const genres = await this.cacheHelper.getGenres()
 
+    // TODO: Validate genre before create movie
+
     return groupedByGenreMovies
       .map((group) => {
-        const { name: genre } = genres.find((i) => i.id === group.tmdbGenreId)
+        const { name: genre } = genres.find(
+          (i) => i.id === group.tmdbGenreId
+        ) || { name: 'UNKNOWN' }
 
         return {
           genre,
