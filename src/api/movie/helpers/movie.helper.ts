@@ -19,8 +19,13 @@ export class MovieHelper {
   }): Promise<GetMainMoviesResponse> {
     const { images } = await this.cacheHelper.getTmdbConfig()
 
+    const genres = await this.cacheHelper.getGenres()
+
     const getImgBaseUrl = (size: number): string =>
       `${images.secureBaseUrl}${images.posterSizes[size]}`
+
+    const getGenreByIds = ([id]: number[]): string =>
+      genres.find((genre) => genre.id === id)?.name || 'Unknown'
 
     return {
       featured: {
@@ -29,9 +34,13 @@ export class MovieHelper {
         overview: featured.overview,
       },
       upcoming: upcoming.map((movie) => ({
+        title: movie.title,
+        genre: getGenreByIds(movie.genreIds),
         imgUrl: `${getImgBaseUrl(5)}${movie.backdropPath}`,
       })),
       popular: popular.map((movie) => ({
+        title: movie.title,
+        genre: getGenreByIds(movie.genreIds),
         imgUrl: `${getImgBaseUrl(3)}${movie.posterPath}`,
       })),
     }
@@ -48,11 +57,13 @@ export class MovieHelper {
       .map((group) => {
         const { name: genre } = genres.find(
           (i) => i.id === group.tmdbGenreId
-        ) || { name: 'UNKNOWN' }
+        ) || { name: 'Unknown' }
 
         return {
           genre,
           movies: group.movies.map((movie) => ({
+            title: movie.title,
+            genre,
             imgUrl: movie.imgUrl,
           })),
         }
