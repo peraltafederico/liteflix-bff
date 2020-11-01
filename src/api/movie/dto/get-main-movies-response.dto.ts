@@ -10,6 +10,11 @@ class Featured {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  readonly genre: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   readonly imgUrl: string
 
   @ApiProperty()

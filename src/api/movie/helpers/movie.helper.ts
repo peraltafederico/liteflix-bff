@@ -30,6 +30,7 @@ export class MovieHelper {
     return {
       featured: {
         title: featured.title,
+        genre: getGenreByIds(featured.genreIds),
         imgUrl: `${getImgBaseUrl(6)}${featured.backdropPath}`,
         overview: featured.overview,
       },
