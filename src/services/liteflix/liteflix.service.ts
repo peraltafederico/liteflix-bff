@@ -1,8 +1,8 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common'
 import { Observable, throwError } from 'rxjs'
 import { catchError, map, tap } from 'rxjs/operators'
-import { Movie } from 'src/api/movie/dto/movie.dto'
-import { GroupedByGenreMovies } from 'src/commons/interfaces'
+import { Movie } from '../../api/movie/dto/movie.dto'
+import { GroupedByGenreMovies } from '../../commons/interfaces'
 
 @Injectable()
 export class LiteflixService {

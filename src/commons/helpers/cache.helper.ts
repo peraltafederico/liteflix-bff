@@ -1,8 +1,8 @@
 import { CACHE_MANAGER, Inject } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Cache } from 'cache-manager'
-import { Genre } from 'src/api/movie/dto/genre.dto'
-import { TmbdService } from 'src/services/tmdb/tmdb.service'
+import { Genre } from '../../api/movie/dto/genre.dto'
+import { TmbdService } from '../../services/tmdb/tmdb.service'
 import { TmdbConfig } from '../interfaces'
 
 export class CacheHelper {

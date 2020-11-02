@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { forkJoin, Observable, throwError } from 'rxjs'
 import { map, tap, catchError } from 'rxjs/operators'
 import { ConfigService } from '@nestjs/config'
-import { CacheHelper } from 'src/commons/helpers/cache.helper'
+import { CacheHelper } from '../../commons/helpers/cache.helper'
 import { TmbdService } from '../../services/tmdb/tmdb.service'
 import { LiteflixService } from '../../services/liteflix/liteflix.service'
 import { MovieHelper } from './helpers/movie.helper'
@@ -32,7 +32,7 @@ export class MovieService {
     const isValidGenre = genres.some((genre) => genre.id === body.tmdbGenreId)
 
     if (!isValidGenre) {
-      this.logger.error(`Movi with title ${body.title} has an invalid genre`)
+      this.logger.error(`Movie with title ${body.title} has an invalid genre`)
 
       throw new BadRequestException('Invalid movie genre')
     }
@@ -41,13 +41,17 @@ export class MovieService {
   }
 
   getGroupedByGenreMovies(): Observable<Promise<ParsedGroupedByGenreMovies[]>> {
-    return this.liteflixService
-      .getGroupedByGenreLiteflixMovies()
-      .pipe(
-        map(async (response) =>
-          this.movieHelper.parseGroupedByGenreMovies(response)
-        )
-      )
+    return this.liteflixService.getGroupedByGenreLiteflixMovies().pipe(
+      map(async (response) =>
+        this.movieHelper.parseGroupedByGenreMovies(response)
+      ),
+      tap(() => this.logger.log('Grouped by genre movies parsed successfully')),
+      catchError((err) => {
+        this.logger.error('There was an error parsing grouped by genre movies')
+
+        return throwError(err)
+      })
+    )
   }
 
   getMainMovies(): Observable<Promise<GetMainMoviesResponse>> {
@@ -84,7 +88,17 @@ export class MovieService {
     )
   }
 
-  getMovieGenres(): Promise<Genre[]> {
-    return this.cacheHelper.getGenres()
+  async getMovieGenres(): Promise<Genre[]> {
+    try {
+      const res = await this.cacheHelper.getGenres()
+
+      this.logger.log('Genres returned successfully from redis')
+
+      return res
+    } catch (error) {
+      this.logger.error('There was an error getting genres from redis')
+
+      throw error
+    }
   }
 }
