@@ -18,12 +18,15 @@
     "jest": true
   },
   "rules": {
-    "@typescript-eslint/interface-name-prefix": 2,
     "@typescript-eslint/explicit-function-return-type": 2,
     "@typescript-eslint/no-explicit-any": 2,
     "import/prefer-default-export": 0,
     "no-param-reassign": 0,
-    "new-cap": 0
+    "new-cap": 0,
+    "@typescript-eslint/no-loop-func": 0,
+    "@typescript-eslint/interface-name-prefix": 0,
+    "@typescript-eslint/no-redeclare": 0,
+    "@typescript-eslint/no-shadow": 0
   },
   "overrides": [
     {
@@ -33,5 +36,5 @@
         "max-classes-per-file": 0
       }
     }
-  ],
+  ]
 }

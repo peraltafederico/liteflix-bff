@@ -1,4 +1,5 @@
 import { CACHE_MANAGER, Inject } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Cache } from 'cache-manager'
 import { Genre } from 'src/api/movie/dto/genre.dto'
 import { TmbdService } from 'src/services/tmdb/tmdb.service'
@@ -7,7 +8,8 @@ import { TmdbConfig } from '../interfaces'
 export class CacheHelper {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
-    private readonly tmdbService: TmbdService
+    private readonly tmdbService: TmbdService,
+    private configService: ConfigService
   ) {}
 
   async getTmdbConfig(): Promise<TmdbConfig> {
@@ -18,7 +20,7 @@ export class CacheHelper {
 
         return JSON.stringify(config)
       },
-      { ttl: 1800 }
+      { ttl: this.configService.get('tmdbConfigTtl') }
     )
 
     return JSON.parse(tmdbConfig)
@@ -32,7 +34,7 @@ export class CacheHelper {
 
         return JSON.stringify(config)
       },
-      { ttl: 1800 }
+      { ttl: this.configService.get('genresTtl') }
     )
     return JSON.parse(genres)
   }
