@@ -37,7 +37,7 @@ export class MovieHelper {
       upcoming: upcoming.map((movie) => ({
         title: movie.title,
         genre: getGenreByIds(movie.genreIds),
-        imgUrl: `${getImgBaseUrl(5)}${movie.backdropPath}`,
+        imgUrl: `${getImgBaseUrl(3)}${movie.backdropPath}`,
       })),
       popular: popular.map((movie) => ({
         title: movie.title,
