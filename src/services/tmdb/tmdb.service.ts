@@ -1,7 +1,7 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common'
 import { Observable, throwError } from 'rxjs'
 import { catchError, map, tap } from 'rxjs/operators'
-import { Genre } from 'src/api/movie/dto/genre.dto'
+import { Genre } from '../../api/movie/dto/genre.dto'
 import { TmdbConfig, TmdbResponse } from '../../commons/interfaces'
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { GroupedByGenreMovies, TmdbMovie } from 'src/commons/interfaces'
-import { CacheHelper } from 'src/commons/helpers/cache.helper'
+import { GroupedByGenreMovies, TmdbMovie } from '../../../commons/interfaces'
+import { CacheHelper } from '../../../commons/helpers/cache.helper'
 import { GetMainMoviesResponse } from '../dto/get-main-movies-response.dto'
 import { ParsedGroupedByGenreMovies } from '../dto/parsed-grouped-by-genre-movies.dto'
 
