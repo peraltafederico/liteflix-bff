@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { forkJoin, Observable, throwError } from 'rxjs'
 import { map, tap, catchError } from 'rxjs/operators'
 import { ConfigService } from '@nestjs/config'
@@ -22,11 +22,21 @@ export class MovieService {
     private configService: ConfigService
   ) {}
 
-  createMovie(body: {
+  async createMovie(body: {
     title: string
     imgUrl: string
     tmdbGenreId: number
-  }): Observable<Movie[]> {
+  }): Promise<Observable<Movie[]>> {
+    const genres = await this.getMovieGenres()
+
+    const isValidGenre = genres.some((genre) => genre.id === body.tmdbGenreId)
+
+    if (!isValidGenre) {
+      this.logger.error(`Movi with title ${body.title} has an invalid genre`)
+
+      throw new BadRequestException('Invalid movie genre')
+    }
+
     return this.liteflixService.createMovie(body)
   }
 
