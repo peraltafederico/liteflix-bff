@@ -52,8 +52,6 @@ export class MovieHelper {
   ): Promise<ParsedGroupedByGenreMovies[]> {
     const genres = await this.cacheHelper.getGenres()
 
-    // TODO: Validate genre before create movie
-
     return groupedByGenreMovies
       .map((group) => {
         const { name: genre } = genres.find(

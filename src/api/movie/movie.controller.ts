@@ -17,7 +17,7 @@ export class MovieController {
     description: 'Movie created successfully',
     type: Movie,
   })
-  createMovie(@Body() body: CreateMovieRequest): Observable<Movie[]> {
+  createMovie(@Body() body: CreateMovieRequest): Promise<Observable<Movie[]>> {
     return this.movieService.createMovie(body)
   }
 
