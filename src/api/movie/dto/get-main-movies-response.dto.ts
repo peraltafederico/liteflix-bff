@@ -10,6 +10,11 @@ class Featured {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  readonly genre: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   readonly imgUrl: string
 
   @ApiProperty()
@@ -22,10 +27,30 @@ class UpcomingMovie {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  readonly title: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  readonly genre: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   readonly imgUrl: string
 }
 
 class PopularMovie {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  readonly title: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  readonly genre: string
+
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

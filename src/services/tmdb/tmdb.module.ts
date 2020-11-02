@@ -7,6 +7,7 @@ import { TmbdService } from './tmdb.service'
     HttpModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
         baseURL: configService.get('tmdbBaseUrl'),
+        language: configService.get('tmdbLanguage'),
       }),
       inject: [ConfigService],
     }),

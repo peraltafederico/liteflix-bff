@@ -1,24 +1,23 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger'
 import { Observable } from 'rxjs'
+import { CreateMovieRequest } from './dto/create-movie-request.dto'
 import { Genre } from './dto/genre.dto'
 import { GetMainMoviesResponse } from './dto/get-main-movies-response.dto'
 import { Movie } from './dto/movie.dto'
-import { ParsedGroupedByGenreMovies } from './dto/parsed-grouped-by-genre-movies'
+import { ParsedGroupedByGenreMovies } from './dto/parsed-grouped-by-genre-movies.dto'
 import { MovieService } from './movie.service'
 
 @Controller('/movie')
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
-  @Post('/liteflix')
+  @Post('/')
   @ApiCreatedResponse({
     description: 'Movie created successfully',
-    type: [Movie],
+    type: Movie,
   })
-  createMovie(
-    @Body() body: { title: string; imgUrl: string; tmdbGenreId: number }
-  ): Observable<Movie[]> {
+  createMovie(@Body() body: CreateMovieRequest): Observable<Movie[]> {
     return this.movieService.createMovie(body)
   }
 

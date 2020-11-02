@@ -11,6 +11,9 @@ interface EnvironmentConfiguration {
   redisHost: string
   redisPass: string
   redisPort: number
+  genresTtl: number
+  tmdbConfigTtl: number
+  tmdbLanguage: string
 }
 
 const {
@@ -21,6 +24,9 @@ const {
   REDIS_HOST,
   REDIS_PORT,
   REDIS_PASSWORD,
+  GENRES_TTL,
+  TMDB_CONFIG_TTL,
+  TMDB_LANGUAGE,
 } = process.env
 
 const envConfig = (): EnvironmentConfiguration => ({
@@ -29,8 +35,11 @@ const envConfig = (): EnvironmentConfiguration => ({
   upcomingMoviesAmount: toNumber(UPCOMING_MOVIES_AMOUNT),
   popularMoviesAmount: toNumber(POPULAR_MOVIES_AMOUNT),
   redisHost: REDIS_HOST,
-  redisPass: REDIS_PASSWORD,
   redisPort: toNumber(REDIS_PORT),
+  redisPass: REDIS_PASSWORD,
+  genresTtl: toNumber(GENRES_TTL),
+  tmdbConfigTtl: toNumber(TMDB_CONFIG_TTL),
+  tmdbLanguage: TMDB_LANGUAGE,
 })
 
 export default envConfig

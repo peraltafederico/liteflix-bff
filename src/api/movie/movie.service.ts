@@ -8,7 +8,7 @@ import { LiteflixService } from '../../services/liteflix/liteflix.service'
 import { MovieHelper } from './helpers/movie.helper'
 import { GetMainMoviesResponse } from './dto/get-main-movies-response.dto'
 import { Movie } from './dto/movie.dto'
-import { ParsedGroupedByGenreMovies } from './dto/parsed-grouped-by-genre-movies'
+import { ParsedGroupedByGenreMovies } from './dto/parsed-grouped-by-genre-movies.dto'
 import { Genre } from './dto/genre.dto'
 
 @Injectable()

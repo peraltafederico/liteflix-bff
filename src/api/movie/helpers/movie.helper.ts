@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { GroupedByGenreMovies, TmdbMovie } from 'src/commons/interfaces'
 import { CacheHelper } from 'src/commons/helpers/cache.helper'
 import { GetMainMoviesResponse } from '../dto/get-main-movies-response.dto'
-import { ParsedGroupedByGenreMovies } from '../dto/parsed-grouped-by-genre-movies'
+import { ParsedGroupedByGenreMovies } from '../dto/parsed-grouped-by-genre-movies.dto'
 
 @Injectable()
 export class MovieHelper {
@@ -19,20 +19,30 @@ export class MovieHelper {
   }): Promise<GetMainMoviesResponse> {
     const { images } = await this.cacheHelper.getTmdbConfig()
 
+    const genres = await this.cacheHelper.getGenres()
+
     const getImgBaseUrl = (size: number): string =>
       `${images.secureBaseUrl}${images.posterSizes[size]}`
+
+    const getGenreByIds = ([id]: number[]): string =>
+      genres.find((genre) => genre.id === id)?.name || 'Unknown'
 
     return {
       featured: {
         title: featured.title,
+        genre: getGenreByIds(featured.genreIds),
         imgUrl: `${getImgBaseUrl(6)}${featured.backdropPath}`,
         overview: featured.overview,
       },
       upcoming: upcoming.map((movie) => ({
-        imgUrl: `${getImgBaseUrl(3)}${movie.posterPath}`,
+        title: movie.title,
+        genre: getGenreByIds(movie.genreIds),
+        imgUrl: `${getImgBaseUrl(5)}${movie.backdropPath}`,
       })),
       popular: popular.map((movie) => ({
-        imgUrl: `${getImgBaseUrl(3)}${movie.backdropPath}`,
+        title: movie.title,
+        genre: getGenreByIds(movie.genreIds),
+        imgUrl: `${getImgBaseUrl(3)}${movie.posterPath}`,
       })),
     }
   }
@@ -42,13 +52,19 @@ export class MovieHelper {
   ): Promise<ParsedGroupedByGenreMovies[]> {
     const genres = await this.cacheHelper.getGenres()
 
+    // TODO: Validate genre before create movie
+
     return groupedByGenreMovies
       .map((group) => {
-        const { name: genre } = genres.find((i) => i.id === group.tmdbGenreId)
+        const { name: genre } = genres.find(
+          (i) => i.id === group.tmdbGenreId
+        ) || { name: 'Unknown' }
 
         return {
           genre,
           movies: group.movies.map((movie) => ({
+            title: movie.title,
+            genre,
             imgUrl: movie.imgUrl,
           })),
         }

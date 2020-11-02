@@ -13,21 +13,19 @@ export class LiteflixService {
     imgUrl: string
     tmdbGenreId: number
   }): Observable<Movie[]> {
-    return this.httpService
-      .post<Movie[]>('/movie', { body })
-      .pipe(
-        map((response) => response.data),
-        tap(() =>
-          this.logger.log(`Movie with title ${body.title} created successfully`)
-        ),
-        catchError((err) => {
-          this.logger.error(
-            `There was an error creating movie with title ${body.title}`
-          )
+    return this.httpService.post<Movie[]>('/movie', body).pipe(
+      map((response) => response.data),
+      tap(() =>
+        this.logger.log(`Movie with title ${body.title} created successfully`)
+      ),
+      catchError((err) => {
+        this.logger.error(
+          `There was an error creating movie with title ${body.title}`
+        )
 
-          return throwError(err)
-        })
-      )
+        return throwError(err)
+      })
+    )
   }
 
   getGroupedByGenreLiteflixMovies(): Observable<GroupedByGenreMovies[]> {

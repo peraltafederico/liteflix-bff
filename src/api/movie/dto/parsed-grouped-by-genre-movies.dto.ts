@@ -5,6 +5,16 @@ class ParsedMovie {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  readonly title: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  readonly genre: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   readonly imgUrl: string
 }
 
